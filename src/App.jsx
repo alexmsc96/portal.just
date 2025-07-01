@@ -10,6 +10,7 @@ function App() {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [searched, setSearched] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -20,6 +21,7 @@ function App() {
     setLoading(true);
     setError(null);
     setResults(null);
+    setSearched(false);
     try {
       const res = await fetch(
         "https://portaljust-production.up.railway.app/api/search-cases",
@@ -30,6 +32,7 @@ function App() {
         }
       );
       const data = await res.json();
+      setSearched(true);
       if (data.error) setError(data.error);
       else if (
         data.CautareDosareResult &&
@@ -37,12 +40,10 @@ function App() {
       ) {
         setResults(data.CautareDosareResult.Dosar);
       } else if (data.CautareDosareResult && data.CautareDosareResult.Dosar) {
-        // If only one result, it's an object, not an array
         setResults([data.CautareDosareResult.Dosar]);
       } else {
         setResults([]);
       }
-      console.log(data);
     } catch (err) {
       setError("Network error");
     }
@@ -52,56 +53,126 @@ function App() {
   return (
     <div className="container">
       <h1>Căutare dosare portal.just.ro</h1>
-      <form onSubmit={handleSubmit} className="search-form">
-        <input
-          type="text"
-          name="numarDosar"
-          placeholder="Număr dosar"
-          value={form.numarDosar}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="obiectDosar"
-          placeholder="Obiect dosar"
-          value={form.obiectDosar}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="numeParte"
-          placeholder="Nume parte"
-          value={form.numeParte}
-          onChange={handleChange}
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Caută..." : "Caută"}
+      <form onSubmit={handleSubmit} className="search-form" autoComplete="off">
+        <div className="form-group">
+          <label htmlFor="numarDosar">Număr dosar</label>
+          <input
+            type="text"
+            name="numarDosar"
+            id="numarDosar"
+            placeholder="Ex: 1234/90/2022"
+            value={form.numarDosar}
+            onChange={handleChange}
+            autoFocus
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="obiectDosar">Obiect dosar</label>
+          <input
+            type="text"
+            name="obiectDosar"
+            id="obiectDosar"
+            placeholder="Ex: furt, divorț, etc."
+            value={form.obiectDosar}
+            onChange={handleChange}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="numeParte">Nume parte</label>
+          <input
+            type="text"
+            name="numeParte"
+            id="numeParte"
+            placeholder="Ex: Popescu Ion"
+            value={form.numeParte}
+            onChange={handleChange}
+          />
+        </div>
+        <button type="submit" disabled={loading} className="search-btn">
+          {loading ? (
+            <span className="loader"></span>
+          ) : (
+            <span role="img" aria-label="search">
+              🔍
+            </span>
+          )}{" "}
+          Caută
         </button>
+        {searched && (
+          <button
+            type="button"
+            className="reset-btn"
+            onClick={() => {
+              setForm({ numarDosar: "", obiectDosar: "", numeParte: "" });
+              setResults(null);
+              setError(null);
+              setSearched(false);
+            }}
+            disabled={loading}
+          >
+            Resetează
+          </button>
+        )}
       </form>
+
+      {loading && <div className="loading-message">Căutare în curs...</div>}
+
       {error && <div className="error">Eroare: {error}</div>}
-      {results && Array.isArray(results) && (
-        <table className="results-table">
-          <thead>
-            <tr>
-              <th>Număr</th>
-              <th>Data</th>
-              <th>Instituție</th>
-              <th>Obiect</th>
-            </tr>
-          </thead>
-          <tbody>
-            {results.map((dosar, idx) => (
-              <tr key={idx}>
-                <td>{dosar.numar}</td>
-                <td>{dosar.data}</td>
-                <td>{dosar.institutie}</td>
-                <td>{dosar.obiectDosar || ""}</td>
+
+      {results && Array.isArray(results) && results.length > 0 && (
+        <div className="results-section">
+          <h2>Rezultate ({results.length})</h2>
+          <table className="results-table">
+            <thead>
+              <tr>
+                <th>Număr</th>
+                <th>Data</th>
+                <th>Instituție</th>
+                <th>Obiect</th>
+                <th>Departament</th>
+                <th>Stadiu</th>
+                <th>Părți</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {results.map((dosar, idx) => (
+                <tr key={idx}>
+                  <td>{dosar.numar}</td>
+                  <td>
+                    {dosar.data ? new Date(dosar.data).toLocaleString() : ""}
+                  </td>
+                  <td>{dosar.institutie}</td>
+                  <td>{dosar.obiectDosar || ""}</td>
+                  <td>{dosar.departament || ""}</td>
+                  <td>{dosar.stadiuProcesual || ""}</td>
+                  <td>
+                    {dosar.parti && Array.isArray(dosar.parti.DosarParte) ? (
+                      dosar.parti.DosarParte.map((p, i) => (
+                        <span key={i}>
+                          {p.nume} ({p.calitateParte})<br />
+                        </span>
+                      ))
+                    ) : dosar.parti && dosar.parti.DosarParte ? (
+                      <span>
+                        {dosar.parti.DosarParte.nume} (
+                        {dosar.parti.DosarParte.calitateParte})
+                      </span>
+                    ) : (
+                      ""
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
-      {results && !Array.isArray(results) && <div>Niciun rezultat găsit.</div>}
+      {searched &&
+        results &&
+        Array.isArray(results) &&
+        results.length === 0 && (
+          <div className="no-results">Niciun rezultat găsit.</div>
+        )}
     </div>
   );
 }
