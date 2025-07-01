@@ -8,7 +8,14 @@ const app = express();
 const PORT = 3001;
 const WSDL_URL = "http://portalquery.just.ro/Query.asmx?wsdl";
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://your-frontend.netlify.app",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
 app.use(bodyParser.json());
 
 // Search cases endpoint

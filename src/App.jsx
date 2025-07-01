@@ -21,11 +21,14 @@ function App() {
     setError(null);
     setResults(null);
     try {
-      const res = await fetch("http://localhost:3001/api/search-cases", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const res = await fetch(
+        "https://portaljust-production.up.railway.app/api/search-cases",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        }
+      );
       const data = await res.json();
       if (data.error) setError(data.error);
       else if (
