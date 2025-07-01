@@ -47,9 +47,6 @@ function App() {
     } catch (err) {
       setError("Network error");
     }
-    setLoading(false);
-  };
-
   return (
     <div className="container">
       <h1>Căutare dosare portal.just.ro</h1>
@@ -95,7 +92,7 @@ function App() {
             <span role="img" aria-label="search">
               🔍
             </span>
-          )}{" "}
+          )} {" "}
           Caută
         </button>
         {searched && (
@@ -132,6 +129,7 @@ function App() {
                 <th>Departament</th>
                 <th>Stadiu</th>
                 <th>Părți</th>
+                <th>Acțiuni</th>
               </tr>
             </thead>
             <tbody>
@@ -160,6 +158,19 @@ function App() {
                     ) : (
                       ""
                     )}
+                  </td>
+                  <td>
+                    <button
+                      className="add-to-isheet-btn"
+                      onClick={() => {
+                        window.parent.postMessage(
+                          { type: "ADD_CASE_TO_ISHEET", caseData: dosar },
+                          "*"
+                        );
+                      }}
+                    >
+                      Adaugă în iSheet
+                    </button>
                   </td>
                 </tr>
               ))}
