@@ -10,7 +10,7 @@ const WSDL_URL = "http://portalquery.just.ro/Query.asmx?wsdl";
 
 app.use(
   cors({
-    origin: "https://your-frontend.netlify.app",
+    origin: "https://https://portaljust.netlify.app/",
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   })
