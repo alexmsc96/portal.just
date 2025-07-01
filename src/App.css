@@ -140,6 +140,10 @@ body {
   color: #fff;
   font-weight: 600;
 }
+.results-table td {
+  color: #222;
+  background: #fafaff;
+}
 .results-table tr:last-child td {
   border-bottom: none;
 }
