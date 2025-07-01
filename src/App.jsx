@@ -165,6 +165,7 @@ function App() {
                     <button
                       className="add-to-isheet-btn"
                       onClick={() => {
+                        console.log("Adding case to iSheet:", dosar);
                         window.parent.postMessage(
                           { type: "ADD_CASE_TO_ISHEET", caseData: dosar },
                           "*"
