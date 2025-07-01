@@ -47,6 +47,9 @@ function App() {
     } catch (err) {
       setError("Network error");
     }
+    setLoading(false);
+  };
+
   return (
     <div className="container">
       <h1>Căutare dosare portal.just.ro</h1>
@@ -92,7 +95,7 @@ function App() {
             <span role="img" aria-label="search">
               🔍
             </span>
-          )} {" "}
+          )}{" "}
           Caută
         </button>
         {searched && (
@@ -129,7 +132,6 @@ function App() {
                 <th>Departament</th>
                 <th>Stadiu</th>
                 <th>Părți</th>
-                <th>Acțiuni</th>
               </tr>
             </thead>
             <tbody>
