@@ -44,6 +44,7 @@ function App() {
       } else {
         setResults([]);
       }
+      console.log("Search results:", data);
     } catch (err) {
       setError("Network error");
     }
